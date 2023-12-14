@@ -2,6 +2,7 @@
 #                                    DEFINS                                    #
 # ---------------------------------------------------------------------------- #
 NAME	:= inquisitor.py
+TARGET	:= inquisitor
 
 SERVER	:= server
 CLIENT	:= client
@@ -22,7 +23,8 @@ IP_CL := $(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.
 MAC_CL := $(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.MacAddress}}{{end}}' $(CLIENT))
 
 run	:
-	./$(NAME) $(IP_SV) $(MAC_SV) $(IP_CL) $(MAC_CL)
+	@echo "Execute: "
+	@echo ./$(NAME) $(IP_SV) $(MAC_SV) $(IP_CL) $(MAC_CL)
 
 # ---------------------------------------------------------------------------- #
 #                                    Docker                                    #
@@ -45,6 +47,9 @@ server	:
 client	:
 	docker exec -it client /bin/sh
 
+inquisitor	:
+	docker exec -it inquisitor /bin/bash
+
 info	:
 	@printf "[docker informations]\n"
 
@@ -59,6 +64,12 @@ info	:
 	@docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(CLIENT)
 	@printf " - MacAddress	: "
 	@docker inspect --format='{{range .NetworkSettings.Networks}}{{.MacAddress}}{{end}}' $(CLIENT)
+
+	@echo $(CYAN)$(TARGET)$(RESET)
+	@printf " - IPAddress	: "
+	@docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(TARGET)
+	@printf " - MacAddress	: "
+	@docker inspect --format='{{range .NetworkSettings.Networks}}{{.MacAddress}}{{end}}' $(TARGET)
 
 perm	:
 	sudo groupadd -f docker
