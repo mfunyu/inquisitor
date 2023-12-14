@@ -1,9 +1,10 @@
 # ---------------------------------------------------------------------------- #
 #                                    DEFINS                                    #
 # ---------------------------------------------------------------------------- #
+NAME	:= inquisitor.py
 
-SERVER := server
-CLIENT:= client
+SERVER	:= server
+CLIENT	:= client
 
 CYAN="\033[1;36m"
 RED="\033[31m"
@@ -13,6 +14,18 @@ RESET="\033[m"
 
 # ---------------------------------------------------------------------------- #
 #                                     RULES                                    #
+# ---------------------------------------------------------------------------- #
+
+IP_SV := $(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(SERVER))
+MAC_SV := $(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.MacAddress}}{{end}}' $(SERVER))
+IP_CL := $(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(CLIENT))
+MAC_CL := $(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.MacAddress}}{{end}}' $(CLIENT))
+
+run	:
+	./$(NAME) $(IP_SV) $(MAC_SV) $(IP_CL) $(MAC_CL)
+
+# ---------------------------------------------------------------------------- #
+#                                    Docker                                    #
 # ---------------------------------------------------------------------------- #
 
 all	:
@@ -46,7 +59,6 @@ info	:
 	@docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(CLIENT)
 	@printf " - MacAddress	: "
 	@docker inspect --format='{{range .NetworkSettings.Networks}}{{.MacAddress}}{{end}}' $(CLIENT)
-
 
 perm	:
 	sudo groupadd -f docker
