@@ -5,12 +5,12 @@ services:
     image: fauria/vsftpd
     container_name: server
     ports:
-      - 2121:21
+      - 21:21
     environment:
       - FTP_USER=ftpuser
       - FTP_PASS=ftppass
     volumes:
-      - /nfs/homes/mfunyu/inquisitor_volume/test:/home/vsftpd:rw
+      - /home/user42/Desktop:/srv
     networks:
       - inquisitor
 
