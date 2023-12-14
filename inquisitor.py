@@ -1,13 +1,14 @@
 #!/usr/bin/python3
 import argparse
+import re
 
 def error_exit(msg):
 	print(f"Error: {msg}")
 	exit(1)
 
-def is_valid_ip(ip):
+def is_valid_ip(ip_str):
 	try:
-		nums = ip.split('.')
+		nums = ip_str.split('.')
 		if len(nums) != 4:
 			return False
 		for n in nums:
@@ -17,8 +18,9 @@ def is_valid_ip(ip):
 	except:
 		return False
 
-def is_valid_mac(mac):
-	return True
+def is_valid_mac(mac_str):
+	mac_pattern = re.compile(r'^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$')
+	return bool(mac_pattern.match(mac_str))
 
 def validate_args(args):
 	if not is_valid_ip(args.ip_src):
