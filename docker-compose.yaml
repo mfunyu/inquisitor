@@ -2,13 +2,13 @@ version: '3.8'
 
 services:
   server:
-    image: fauria/vsftpd #panudo ?
+    image: panubo/vsftpd:latest
     container_name: server
     ports:
       - "21:21"
     environment:
       - FTP_USER=ftpuser
-      - FTP_PASS=ftppass
+      - FTP_PASSWORD=ftppass
     volumes:
       - /home/user42/Desktop:/srv
     networks:
