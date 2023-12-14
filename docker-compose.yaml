@@ -24,5 +24,10 @@ services:
     networks:
       - inquisitor
 
+  inquisitor:
+    build: .
+    image: inquisitor
+    container_name: inquisitor
+
 networks:
   inquisitor:
