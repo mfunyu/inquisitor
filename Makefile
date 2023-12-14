@@ -46,3 +46,9 @@ info	:
 	@docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(CLIENT)
 	@printf " - MacAddress	: "
 	@docker inspect --format='{{range .NetworkSettings.Networks}}{{.MacAddress}}{{end}}' $(CLIENT)
+
+
+perm	:
+	sudo groupadd -f docker
+	sudo usermod -aG docker $(USER)
+	newgrp docker
