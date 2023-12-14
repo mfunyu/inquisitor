@@ -15,11 +15,10 @@ def spoof(ip_target, mac_target, ip_src):
 
 def inquisitor(data):
 
-	while True:
-		spoof(data.ip_target, data.mac_target, data.ip_src)
-		spoof(data.ip_src, data.mac_src, data.ip_target)
-
-		time.sleep(1)
+	spoof(data.ip_target, data.mac_target, data.ip_src)
+	spoof(data.ip_src, data.mac_src, data.ip_target)
+	#while True:
+	#	time.sleep(1)
 
 def is_valid_ip(ip_str):
 	try:
