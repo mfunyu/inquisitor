@@ -2,10 +2,10 @@ version: '3.8'
 
 services:
   server:
-    image: fauria/vsftpd
+    image: fauria/vsftpd #panudo ?
     container_name: server
     ports:
-      - 21:21
+      - "21:21"
     environment:
       - FTP_USER=ftpuser
       - FTP_PASS=ftppass
@@ -18,7 +18,7 @@ services:
     image: jlesage/filezilla
     container_name: client
     ports:
-      - 5800:5800
+      - "5800:5800"
     volumes:
       - ./storage:/storage:rw
     networks:
