@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  server:
+    image: fauria/vsftpd
+    container_name: server
+    ports:
+      - 2121:21
+    environment:
+      - FTP_USER=ftpuser
+      - FTP_PASS=ftppass
+    volumes:
+      - /nfs/homes/mfunyu/inquisitor_volume/test:/home/vsftpd:rw
+    networks:
+      - inquisitor
+
+  client:
+    image: jlesage/filezilla
+    container_name: client
+    ports:
+      - 5800:5800
+    volumes:
+      - ./storage:/storage:rw
+    networks:
+      - inquisitor
+
+networks:
+  inquisitor:

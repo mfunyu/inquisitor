@@ -26,6 +26,12 @@ fclean	: clean
 	-docker rm $(shell docker ps -qa) 2>/dev/null
 	-docker rmi -f $(shell docker images -qa) 2>/dev/null
 
+server	:
+	docker exec -it server /bin/bash
+
+client	:
+	docker exec -it client /bin/sh
+
 info	:
 	@printf "[docker informations]\n"
 
