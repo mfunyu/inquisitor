@@ -24,9 +24,7 @@ clean	:
 	docker-compose down
 
 fclean	: clean
-	-docker stop $(shell docker ps -qa) 2>/dev/null
-	-docker rm $(shell docker ps -qa) 2>/dev/null
-	-docker rmi -f $(shell docker images -qa) 2>/dev/null
+	-docker system prune -f -a
 
 server	:
 	docker exec -it server /bin/bash
