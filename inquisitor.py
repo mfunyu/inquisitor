@@ -23,14 +23,17 @@ def is_valid_mac(mac_str):
 	return bool(mac_pattern.match(mac_str))
 
 def validate_args(args):
-	if not is_valid_ip(args.ip_src):
-		error_exit("Invalid IP-src")
-	if not is_valid_mac(args.mac_src):
-		error_exit("Invalid MAC-src")
-	if not is_valid_ip(args.ip_target):
-		error_exit("Invalid IP-target")
-	if not is_valid_mac(args.mac_target):
-		error_exit("Invalid MAC-target")
+	try:
+		if not is_valid_ip(args.ip_src):
+			error_exit("Invalid IP-src")
+		if not is_valid_mac(args.mac_src):
+			error_exit("Invalid MAC-src")
+		if not is_valid_ip(args.ip_target):
+			error_exit("Invalid IP-target")
+		if not is_valid_mac(args.mac_target):
+			error_exit("Invalid MAC-target")
+	except Exception as e:
+		error_exit(e)
 
 def parse_args():
 	parser = argparse.ArgumentParser()
