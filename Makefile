@@ -17,19 +17,6 @@ RESET="\033[m"
 #                                     RULES                                    #
 # ---------------------------------------------------------------------------- #
 
-IP_SV := $(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(SERVER))
-MAC_SV := $(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.MacAddress}}{{end}}' $(SERVER))
-IP_CL := $(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(CLIENT))
-MAC_CL := $(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.MacAddress}}{{end}}' $(CLIENT))
-
-run	:
-	@echo "Execute: "
-	@echo ./$(NAME) $(IP_SV) $(MAC_SV) $(IP_CL) $(MAC_CL)
-
-# ---------------------------------------------------------------------------- #
-#                                    Docker                                    #
-# ---------------------------------------------------------------------------- #
-
 all	:
 	docker-compose up --build
 
@@ -75,3 +62,12 @@ perm	:
 	sudo groupadd -f docker
 	sudo usermod -aG docker $(USER)
 	newgrp docker
+
+IP_SV := $(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(SERVER))
+MAC_SV := $(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.MacAddress}}{{end}}' $(SERVER))
+IP_CL := $(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(CLIENT))
+MAC_CL := $(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.MacAddress}}{{end}}' $(CLIENT))
+
+run	:
+	@echo "Execute: "
+	@echo ./$(NAME) $(IP_SV) $(MAC_SV) $(IP_CL) $(MAC_CL)
