@@ -6,5 +6,6 @@ RUN apt-get -y update \
 WORKDIR /usr/src/app
 
 COPY inquisitor.py .
+RUN sed -i "s;#!/usr/bin/python3;#!/usr/local/bin/python3;" inquisitor.py
 
 CMD ["tail", "-f", "/dev/null"]
