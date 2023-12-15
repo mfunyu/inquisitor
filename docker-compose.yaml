@@ -10,7 +10,7 @@ services:
       - FTP_USER=ftpuser
       - FTP_PASSWORD=ftppass
     volumes:
-      - ./server:/srv
+      - /home/user42/Desktop:/srv
     networks:
       - inquisitor
 
