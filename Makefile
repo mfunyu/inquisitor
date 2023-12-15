@@ -61,6 +61,10 @@ perm	:
 	sudo usermod -aG docker $(USER)
 	newgrp docker
 
+# ---------------------------------------------------------------------------- #
+#                                     UTILS                                    #
+# ---------------------------------------------------------------------------- #
+
 IP_SV := $(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(SERVER))
 MAC_SV := $(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.MacAddress}}{{end}}' $(SERVER))
 IP_CL := $(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(CLIENT))
@@ -69,3 +73,6 @@ MAC_CL := $(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{
 run	:
 	@echo "Execute: "
 	@echo ./$(NAME) $(IP_SV) $(MAC_SV) $(IP_CL) $(MAC_CL)
+
+copy	:
+	docker cp inquisitor.py inquisitor:/usr/src/app
