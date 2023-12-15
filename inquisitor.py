@@ -44,7 +44,7 @@ class Inquisitor:
 			payload = packet[scapy.Raw].load
 			if b"RETR" in payload or b"STOR" in payload:
 				ftp_command = payload.decode('utf-8')
-				file_name = extract_file_name(payload)
+				file_name = self.extract_file_name(payload)
 				if file_name:
 					print(f"File: {file_name}")
 
