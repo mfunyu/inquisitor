@@ -25,9 +25,17 @@ all	:
 clean	:
 	docker-compose down
 
+.PHONY: prune
+prune	: clean
+	-docker system prune -f -a
+
 .PHONY: fclean
 fclean	: clean
-	-docker system prune -f -a
+	-docker stop $(shell docker ps -qa) 2>/dev/null
+	-docker rm $(shell docker ps -qa) 2>/dev/null
+	-docker rmi -f $(shell docker images -qa) 2>/dev/null
+	-docker volume rm $(shell docker volume ls -q) 2>/dev/null
+	-docker network rm $(shell docker network ls -q) 2>/dev/null
 
 .PHONY: server
 server	:
