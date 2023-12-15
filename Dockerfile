@@ -1,7 +1,13 @@
 FROM python:3
 
 RUN apt-get -y update \
+	&& apt-get -y install openssh-server \
 	&& pip install scapy
+
+EXPOSE 22
+
+RUN useradd -m -s /bin/bash user \
+	&& echo "user:password" | chpasswd
 
 WORKDIR /usr/src/app
 
