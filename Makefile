@@ -17,24 +17,31 @@ RESET="\033[m"
 #                                     RULES                                    #
 # ---------------------------------------------------------------------------- #
 
+.PHONY: all
 all	:
 	docker-compose up --build
 
+.PHONY: clean
 clean	:
 	docker-compose down
 
+.PHONY: fclean
 fclean	: clean
 	-docker system prune -f -a
 
+.PHONY: server
 server	:
 	docker exec -it server /bin/bash
 
+.PHONY: client
 client	:
 	docker exec -it client /bin/sh
 
+.PHONY: inquisitor
 inquisitor	:
 	docker exec -it inquisitor /bin/bash
 
+.PHONY: info
 info	:
 	@printf "[docker informations]\n"
 
@@ -56,6 +63,7 @@ info	:
 	@printf " - MacAddress	: "
 	@docker inspect --format='{{range .NetworkSettings.Networks}}{{.MacAddress}}{{end}}' $(TARGET)
 
+.PHONY: perm
 perm	:
 	sudo groupadd -f docker
 	sudo usermod -aG docker $(USER)
@@ -70,9 +78,11 @@ MAC_SV := $(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{
 IP_CL := $(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(CLIENT))
 MAC_CL := $(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.MacAddress}}{{end}}' $(CLIENT))
 
+.PHONY: run
 run	:
 	@echo "Execute: "
 	@echo ./$(NAME) $(IP_SV) $(MAC_SV) $(IP_CL) $(MAC_CL)
 
-copy	:
+.PHONY: cp
+cp	:
 	docker cp inquisitor.py inquisitor:/usr/src/app
