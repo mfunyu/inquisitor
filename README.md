@@ -7,6 +7,8 @@ When the attack is stopped (CTRL+C), the ARP tables will be restored.
 
 ## Usage
 
+Works on the Linux platform
+
 ```
 usage: inquisitor.py [-h] ip_src mac_src ip_target mac_target
 
@@ -71,12 +73,17 @@ make
   ```
   make run
   ```
+
+- show info
+  ```
+  make info
+  ```
 - connect to container
   ```
   make inquisitor
   ```
 - execute
   ```
-
+  ./inquisitor.py <IP-src> <MAC-src> <IP-target> <MAC-target>
   ```
 
